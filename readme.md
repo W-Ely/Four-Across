@@ -1,6 +1,6 @@
 #A Logic Playground
 
-##Where I will learn to build a simple four across game
+##Where I will learn to build a simple connect four game
 
 ###Tasks at hand
 

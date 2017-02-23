@@ -1,0 +1,18 @@
+.choice {
+  width: 700px;
+  height: 100px;
+  border: 1px solid black;
+  border-collapse: collapse;
+  margin-bottom: 10px;
+}
+.board {
+  width: 700px;
+  height: 600px;
+  border: 1px solid black;
+  border-collapse: collapse;
+}
+td {
+  height: 100px;
+  width: 100px;
+  border: 1px solid black;
+}
