@@ -10,14 +10,20 @@ var boardCoords = [
   ['', '', '', '', '', '', ''],
 ];
 
-var bCHips = [];
+var bChips = [];
 var rChips = [];
 var choices = ['column1', 'column2', 'column3', 'column4', 'column5', 'column6', 'column7'];
 function Chip(color){
   this.color = color;
 }
-Chip.prototype.findLocation = function(dropColumn) {
-  this.location = dropColumn;// <-------need logic
+Chip.prototype.findLandingLocation = function(yCoord) {
+  for (var xCoord = 0; xCoord < boardCoords.length; xCoord++) {
+    if (boardCoords[xCoord][yCoord] === '' ){
+      boardCoords[xCoord][yCoord] = 'b';
+      this.location = {x: xCoord, y: yCoord};
+      break;
+    }
+  }
 };
 Chip.prototype.neighbors = function(){
 
@@ -31,8 +37,14 @@ function addEvents(choices){
 function handleClick(event){
   event.preventDefault();
   event.stopPropagation();
-  var chip = new Chip('b', choices.indexOf(event.currentTarget.id));
-  console.log('This is the new chip', chip);
+  var yCoord = choices.indexOf(event.currentTarget.id);
+  if (boardCoords[5][yCoord] === '') {
+    var chip = new Chip('b');
+    chip.findLandingLocation(yCoord);
+    console.log('This is the new chip', chip);
+  } else {
+    console.log('Looks like that column is full!');
+  }
 }
 addEvents(choices);
 //finds x:y coords or matched color
