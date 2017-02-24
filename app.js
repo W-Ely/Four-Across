@@ -129,6 +129,7 @@ function handleClick(event){
     console.log('This new chip is at x:y ' + chip.location.x + ':' + chip.location.y);
     chip.findNeighbors();
     bChips.push(chip);
+    changeBoardColors(chip);
   } else {
     console.log('Looks like that column is full!');
   }
@@ -147,11 +148,35 @@ function checkChipsForWinner(){
       }
     }
     if (bChips[i].hasTwoNegativeNeighbors){
+      for (var j = 0; j < bChips[i].neighbors.negativeSlope.length; j++){
+        if(bChips[bChips[i].neighbors.negativeSlope[j]].hasTwoNegativeNeighbors){
+          console.log('Yup we\'ve got four in a row');
+        }
+      }
     }
     if (bChips[i].hasTwoHorizontalNeighbors){
+      for (var j = 0; j < bChips[i].neighbors.horizontalSlope.length; j++){
+        if(bChips[bChips[i].neighbors.horizontalSlope[j]].hasTwoHorizontalNeighbors){
+          console.log('Yup we\'ve got four in a row');
+        }
+      }
     }
     if (bChips[i].hasTwoVerticalNeighbors){
+      for (var j = 0; j < bChips[i].neighbors.verticalSlope.length; j++){
+        if(bChips[bChips[i].neighbors.verticalSlope[j]].hasTwoVerticalNeighbors){
+          console.log('Yup we\'ve got four in a row');
+        }
+      }
     }
   }
 }
+function changeBoardColors(chip){
+  var chipLocation = document.getElementById('x' + chip.location.x + 'y' + chip.location.y);
+  if (chip.color = 'b') {
+    chipLocation.setAttribute('style', 'background-color: blue');
+  } else {
+    chipLocation.setAttribute('style', 'background-color: red');
+  }
+}
 addEvents(choices);
+console.log('');
