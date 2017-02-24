@@ -17,8 +17,8 @@ function Chip(color){
   this.color = color;
   this.neighborPositiveSlope = [];
   this.neighborNegativeSlope = [];
-  this.neighborVertical = [];
-  this.neighborHorizontal = [];
+  this.neighborVerticalSlope = [];
+  this.neighborHorizontalSlope = [];
 }
 Chip.prototype.findLandingLocation = function(yCoord) {
   for (var xCoord = 0; xCoord < boardCoords.length; xCoord++) {
@@ -35,8 +35,27 @@ Chip.prototype.findNeighbors = function(){
     var otherYCoord = bChips[i].location.y;
     var thisXCoord = this.location.x;
     var thisYCoord = this.location.y;
+    //does the chip have a neighbor.
     if ((Math.abs(otherXCoord - thisXCoord) === 1 && Math.abs(otherYCoord === thisYCoord) === 1) || (otherXCoord - thisXCoord === 0 && Math.abs(otherYCoord - thisYCoord === 1)) || (otherYCoord - thisYCoord === 0 && Math.abs(otherXCoord - thisXCoord === 1 ))){
-      console.log('That seems a bit much! But ' + otherXCoord + ':' + bChips[i].location.y + ' is next to ' + thisXCoord + ':' + thisYCoord);
+      // console.log('That seems a bit much! But ' + otherXCoord + ':' + bChips[i].location.y + ' is next to ' + thisXCoord + ':' + thisYCoord);
+      //Which neighbor is it?
+      if( (otherYCoord - thisYCoord) / (otherXCoord - thisXCoord) === 1 ) {
+        this.neighborPositiveSlope.push(bChips[i]);
+        bChips[i].neighborPositiveSlope.push(this.chip);
+        console.log('This chip', this, 'and this chip', bChips[i], 'are now PositiveSlope neighbors');
+      } else if ((otherYCoord - thisYCoord) / (otherXCoord - thisXCoord) === -1) {
+        this.neighborNegativeSlope.push(bChips[i]);
+        bChips[i].neighborNegativeSlope.push(this.chip);
+        console.log('This chip', this, 'and this chip', bChips[i], 'are now NegativeSlope neighbors');
+      } else if ((otherYCoord - thisYCoord) / (otherXCoord - thisXCoord) === 0) {
+        this.neighborHorizontalSlope.push(bChips[i]);
+        bChips[i].neighborHorizontalSlope.push(this.chip);
+        console.log('This chip', this, 'and this chip', bChips[i], 'are now Horizontal neighbors');
+      } else {
+        this.neighborVerticalSlope.push(bChips[i]);
+        bChips[i].neighborVerticalSlope.push(this.chip);
+        console.log('This chip', this, 'and this chip', bChips[i], 'are now Vertical neighbors');
+      }
     };
   }
 };
@@ -65,17 +84,3 @@ function checkChipsForWinner(chip){
 
 }
 addEvents(choices);
-//finds x:y coords or matched color
-// function scanBoard(color) {
-//   console.log('scanBoard is called');
-//   for (var xCoord = 0; xCoord < boardCoords.length; xCoord++) {
-//     for (var yCoord = 0; yCoord < boardCoords[xCoord].length; yCoord++) {
-//       if(boardCoords[xCoord][yCoord] === color){
-//         console.log('x:y Coords are ' + xCoord + ':' + yCoord );
-//       } else {
-//         console.log('Nothing to see here.');
-//       }
-//     }
-//   }
-// }
-// scanBoard('b');
