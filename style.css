@@ -19,3 +19,6 @@ td {
 body {
   background-color: white;
 }
+.winner {
+  font-size: 60px;
+}

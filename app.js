@@ -9,11 +9,13 @@ var boardCoords = [
   ['', '', '', '', '', '', ''],
   ['', '', '', '', '', '', ''],
 ];
-
+var boardHeight = 6;
+var boardWidth = 7;
 var bChips = [];
 var rChips = [];
 var choices = ['column1', 'column2', 'column3', 'column4', 'column5', 'column6', 'column7'];
 var checkWinner = false;
+var winnerFound = false;
 function Chip(color){
   this.color = color;
   this.neighbors = {};
@@ -35,11 +37,11 @@ Chip.prototype.findLandingLocation = function(yCoord) {
     }
   }
 };
-Chip.prototype.findNeighbors = function(){
+Chip.prototype.findNeighbors = function(chips){
   checkWinner = false;
-  for (var i = 0; i < bChips.length; i++) {
-    var otherXCoord = bChips[i].location.x;
-    var otherYCoord = bChips[i].location.y;
+  for (var i = 0; i < chips.length; i++) {
+    var otherXCoord = chips[i].location.x;
+    var otherYCoord = chips[i].location.y;
     var thisXCoord = this.location.x;
     var thisYCoord = this.location.y;
     //does the chip have a neighbors. 7 case 0:0 with X1:-1, X0:-1, X-1,-1, X-1,0, X-1,1, X0,1, X1,1 X0:-1
@@ -54,10 +56,10 @@ Chip.prototype.findNeighbors = function(){
       //Which neighbors is it?
       if (thisYCoord - otherYCoord === 0){
         this.neighbors.verticalSlope.push(i);
-        bChips[i].neighbors.verticalSlope.push(bChips.length);
-        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, bChips[i], 'are now Vertical neighbors');
-        if (bChips[i].neighbors.verticalSlope.length === 2) {
-          bChips[i].hasTwoVerticalNeighbors = true;
+        chips[i].neighbors.verticalSlope.push(chips.length);
+        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, chips[i], 'are now Vertical neighbors');
+        if (chips[i].neighbors.verticalSlope.length === 2) {
+          chips[i].hasTwoVerticalNeighbors = true;
           checkWinner = true;
           console.log('The other chip ' + otherXCoord + ':' + otherYCoord + ' now has 2 Vertical Slope neighbors');
         }
@@ -68,10 +70,10 @@ Chip.prototype.findNeighbors = function(){
         }
       } else if (thisXCoord - otherXCoord === 0) {
         this.neighbors.horizontalSlope.push(i);
-        bChips[i].neighbors.horizontalSlope.push(bChips.length);
-        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, bChips[i], 'are now Horizontal neighbors');
-        if (bChips[i].neighbors.horizontalSlope.length === 2) {
-          bChips[i].hasTwoHorizontalNeighbors = true;
+        chips[i].neighbors.horizontalSlope.push(chips.length);
+        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, chips[i], 'are now Horizontal neighbors');
+        if (chips[i].neighbors.horizontalSlope.length === 2) {
+          chips[i].hasTwoHorizontalNeighbors = true;
           checkWinner = true;
           console.log('The other chip ' + otherXCoord + ':' + otherYCoord + ' now has 2 Horizontal Slope neighbors');
         }
@@ -82,10 +84,10 @@ Chip.prototype.findNeighbors = function(){
         }
       } else if( ((thisYCoord - otherYCoord) / (thisXCoord - otherXCoord)) === 1 ) {
         this.neighbors.positiveSlope.push(i);
-        bChips[i].neighbors.positiveSlope.push(bChips.length);
-        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, bChips[i], 'are now PositiveSlope neighbors');
-        if (bChips[i].neighbors.positiveSlope.length === 2) {
-          bChips[i].hasTwoPositiveNeighbors = true;
+        chips[i].neighbors.positiveSlope.push(chips.length);
+        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, chips[i], 'are now PositiveSlope neighbors');
+        if (chips[i].neighbors.positiveSlope.length === 2) {
+          chips[i].hasTwoPositiveNeighbors = true;
           checkWinner = true;
           console.log('The other chip ' + otherXCoord + ':' + otherYCoord + ' now has 2 Positive Slope neighbors');
         }
@@ -96,10 +98,10 @@ Chip.prototype.findNeighbors = function(){
         }
       } else if (((thisYCoord - otherYCoord) / (thisXCoord - otherXCoord)) === (-1)) {
         this.neighbors.negativeSlope.push(i);
-        bChips[i].neighbors.negativeSlope.push(bChips.length + 1);
-        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, bChips[i], 'are now NegativeSlope neighbors');
-        if (bChips[i].neighbors.negativeSlope.length === 2) {
-          bChips[i].hasTwoNegativeNeighbors = true;
+        chips[i].neighbors.negativeSlope.push(chips.length + 1);
+        console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, chips[i], 'are now NegativeSlope neighbors');
+        if (chips[i].neighbors.negativeSlope.length === 2) {
+          chips[i].hasTwoNegativeNeighbors = true;
           checkWinner = true;
           console.log('The other chip ' + otherXCoord + ':' + otherYCoord + ' now has 2 Negative Slope neighbors');
         }
@@ -123,48 +125,60 @@ function handleClick(event){
   event.preventDefault();
   event.stopPropagation();
   var yCoord = choices.indexOf(event.currentTarget.id);
-  if (boardCoords[5][yCoord] === '') {
+  if (boardCoords[boardHeight - 1][yCoord] === '') {
     var chip = new Chip('b');
     chip.findLandingLocation(yCoord);
     console.log('This new chip is at x:y ' + chip.location.x + ':' + chip.location.y);
-    chip.findNeighbors();
+    chip.findNeighbors(bChips);
     bChips.push(chip);
     changeBoardColors(chip);
   } else {
     console.log('Looks like that column is full!');
   }
   if(checkWinner){
-    checkChipsForWinner();
+    checkChipsForWinner(bChips);
   }
+  computersTurn();
 }
-function checkChipsForWinner(){
-  console.log('Checking for Winner!');
-  for (var i = 0; i < bChips.length; i++) {
-    if (bChips[i].hasTwoPositiveNeighbors){
-      for (var j = 0; j < bChips[i].neighbors.positiveSlope.length; j++){
-        if(bChips[bChips[i].neighbors.positiveSlope[j]].hasTwoPositiveNeighbors){
-          console.log('Yup we\'ve got four in a row');
+function checkChipsForWinner(chips){
+  console.log('Checking for winner.....');
+  while (winnerFound === false){
+    for (var i = 0; i < chips.length; i++) {
+      if (chips[i].hasTwoPositiveNeighbors){
+        for (var j = 0; j < chips[i].neighbors.positiveSlope.length; j++){
+          if(chips[chips[i].neighbors.positiveSlope[j]].hasTwoPositiveNeighbors){
+            console.log('Yup we\'ve got four in a row');
+            declareWinner(chips[0].color);
+            winnerFound = true;
+          }
         }
       }
-    }
-    if (bChips[i].hasTwoNegativeNeighbors){
-      for (var j = 0; j < bChips[i].neighbors.negativeSlope.length; j++){
-        if(bChips[bChips[i].neighbors.negativeSlope[j]].hasTwoNegativeNeighbors){
-          console.log('Yup we\'ve got four in a row');
+      if (chips[i].hasTwoNegativeNeighbors){
+        for (var j = 0; j < chips[i].neighbors.negativeSlope.length; j++){
+          if(chips[chips[i].neighbors.negativeSlope[j]].hasTwoNegativeNeighbors){
+            console.log('Yup we\'ve got four in a row');
+            declareWinner(chips[0].color);
+            winnerFound = true;
+          }
         }
       }
-    }
-    if (bChips[i].hasTwoHorizontalNeighbors){
-      for (var j = 0; j < bChips[i].neighbors.horizontalSlope.length; j++){
-        if(bChips[bChips[i].neighbors.horizontalSlope[j]].hasTwoHorizontalNeighbors){
-          console.log('Yup we\'ve got four in a row');
+      if (chips[i].hasTwoHorizontalNeighbors){
+        for (var j = 0; j < chips[i].neighbors.horizontalSlope.length; j++){
+          if(chips[chips[i].neighbors.horizontalSlope[j]].hasTwoHorizontalNeighbors){
+            console.log('Yup we\'ve got four in a row');
+            declareWinner(chips[0].color);
+            winnerFound = true;
+
+          }
         }
       }
-    }
-    if (bChips[i].hasTwoVerticalNeighbors){
-      for (var j = 0; j < bChips[i].neighbors.verticalSlope.length; j++){
-        if(bChips[bChips[i].neighbors.verticalSlope[j]].hasTwoVerticalNeighbors){
-          console.log('Yup we\'ve got four in a row');
+      if (chips[i].hasTwoVerticalNeighbors){
+        for (var j = 0; j < chips[i].neighbors.verticalSlope.length; j++){
+          if(chips[chips[i].neighbors.verticalSlope[j]].hasTwoVerticalNeighbors){
+            console.log('Yup we\'ve got four in a row');
+            declareWinner(chips[0].color);
+            winnerFound = true;
+          }
         }
       }
     }
@@ -172,11 +186,40 @@ function checkChipsForWinner(){
 }
 function changeBoardColors(chip){
   var chipLocation = document.getElementById('x' + chip.location.x + 'y' + chip.location.y);
-  if (chip.color = 'b') {
+  console.log('Checking Chip location for color change ' + 'x' + chip.location.x + 'y' + chip.location.y);
+  if (chip.color === 'b') {
     chipLocation.setAttribute('style', 'background-color: blue');
   } else {
     chipLocation.setAttribute('style', 'background-color: red');
   }
 }
+function computersTurn(){
+  console.log('-------Computer Turn--------');
+  var chip = new Chip('r');
+  console.log('brand new computer chip', chip);
+  chip.findLandingLocation(getRandomDropColumn());
+  console.log('This new computer chip is at x:y ' + chip.location.x + ':' + chip.location.y);
+  chip.findNeighbors(rChips);
+  rChips.push(chip);
+  changeBoardColors(chip);
+  if(checkWinner){
+    checkChipsForWinner(rChips);
+  }
+}
+function getRandomDropColumn(){
+  var randomNum;
+  while (boardCoords[boardHeight - 1][randomNum] !== ''){
+    randomNum = Math.floor(Math.random() * boardWidth);
+  }
+  return randomNum;
+}
+function declareWinner(color){
+  var winningText = document.createElement('span');
+  if (color === 'b') {
+    winningText.textContent = 'You Win!!!';
+  } else {
+    winningText.textContent = 'Computer Wins!!!';
+  }
+  document.getElementById('winner').appendChild(winningText);
+}
 addEvents(choices);
-console.log('');
