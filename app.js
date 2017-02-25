@@ -44,11 +44,11 @@ Chip.prototype.findNeighbors = function(chips){
     var thisXCoord = this.location.x;
     var thisYCoord = this.location.y;
     //does the chip have a neighbors. 7 case 0:0 with X1:-1, X0:-1, X-1,-1, X-1,0, X-1,1, X0,1, X1,1 X0:-1
-    // passing 0:0 and 1:-1, -1:-1, -1:1, 1:1 diagonals
+    // passing 0:0 with 1:-1, -1:-1, -1:1, 1:1 diagonals
     if ((Math.abs(thisXCoord - otherXCoord) === 1 && Math.abs(thisYCoord - otherYCoord) === 1) ||
-      //passing 0:0 and 0:1, 0:-1, horizontal
+      //passing 0:0 with 0:1, 0:-1, horizontal
       (thisXCoord - otherXCoord === 0 && Math.abs(thisYCoord - otherYCoord) === 1) ||
-      //passing -1:0, down below
+      //passing 0:0 with -1:0, down below
       (Math.abs(thisXCoord - otherXCoord) === 1 && thisYCoord - otherYCoord === 0)){
       console.log('Chip ' + thisXCoord + ':' + thisYCoord + ' is next to chip ' + otherXCoord + ':' + otherYCoord);
       console.log('The slope is ((ThisY - OtherY)/(ThisX - OtherX))', ((thisYCoord - otherYCoord) / (thisXCoord - otherXCoord)));
@@ -118,8 +118,6 @@ function addEvents(choices){
     var choiceBox = document.getElementById(choices[i]);
     choiceBox.addEventListener('click', handleClick);
   }
-  // var gameBoard = document.getElementById('game-board');
-  // gameBoard.addEventListener('click', handleClick);
 }
 function handleClick(event){
   console.log('--------Begin New Chip-----------');
@@ -227,7 +225,5 @@ function removeEvents(){
     var choiceBox = document.getElementById(choices[i]);
     choiceBox.removeEventListener('click', handleClick);
   }
-  // var gameBoard = document.getElementById('game-board');
-  // gameBoard.removeEventListener('click', handleClick);
 }
 addEvents(choices);
