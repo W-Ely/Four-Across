@@ -15,7 +15,6 @@ var bChips = [];
 var rChips = [];
 var choices = ['column1', 'column2', 'column3', 'column4', 'column5', 'column6', 'column7'];
 var checkWinner = false;
-var winnerFound = false;
 function Chip(color){
   this.color = color;
   this.neighbors = {};
@@ -140,45 +139,43 @@ function handleClick(event){
   }
   computersTurn();
 }
+//obviously could be DRYer
 function checkChipsForWinner(chips){
   console.log('Checking for winner.....');
-  while (winnerFound === false){
-    for (var i = 0; i < chips.length; i++) {
-      if (chips[i].hasTwoPositiveNeighbors){
-        for (var j = 0; j < chips[i].neighbors.positiveSlope.length; j++){
-          if(chips[chips[i].neighbors.positiveSlope[j]].hasTwoPositiveNeighbors){
-            console.log('Yup we\'ve got four in a row');
-            declareWinner(chips[0].color);
-            winnerFound = true;
-          }
+  for (var i = 0; i < chips.length; i++) {
+    if (chips[i].hasTwoPositiveNeighbors){
+      for (var j = 0; j < chips[i].neighbors.positiveSlope.length; j++){
+        if(chips[chips[i].neighbors.positiveSlope[j]].hasTwoPositiveNeighbors){
+          console.log('Yup we\'ve got four in a row');
+          declareWinner(chips[0].color);
+          i = chips.length;
         }
       }
-      if (chips[i].hasTwoNegativeNeighbors){
-        for (var j = 0; j < chips[i].neighbors.negativeSlope.length; j++){
-          if(chips[chips[i].neighbors.negativeSlope[j]].hasTwoNegativeNeighbors){
-            console.log('Yup we\'ve got four in a row');
-            declareWinner(chips[0].color);
-            winnerFound = true;
-          }
+    }
+    if (chips[i].hasTwoNegativeNeighbors){
+      for (var j = 0; j < chips[i].neighbors.negativeSlope.length; j++){
+        if(chips[chips[i].neighbors.negativeSlope[j]].hasTwoNegativeNeighbors){
+          console.log('Yup we\'ve got four in a row');
+          declareWinner(chips[0].color);
+          i = chips.length;
         }
       }
-      if (chips[i].hasTwoHorizontalNeighbors){
-        for (var j = 0; j < chips[i].neighbors.horizontalSlope.length; j++){
-          if(chips[chips[i].neighbors.horizontalSlope[j]].hasTwoHorizontalNeighbors){
-            console.log('Yup we\'ve got four in a row');
-            declareWinner(chips[0].color);
-            winnerFound = true;
-
-          }
+    }
+    if (chips[i].hasTwoHorizontalNeighbors){
+      for (var j = 0; j < chips[i].neighbors.horizontalSlope.length; j++){
+        if(chips[chips[i].neighbors.horizontalSlope[j]].hasTwoHorizontalNeighbors){
+          console.log('Yup we\'ve got four in a row');
+          declareWinner(chips[0].color);
+          i = chips.length;
         }
       }
-      if (chips[i].hasTwoVerticalNeighbors){
-        for (var j = 0; j < chips[i].neighbors.verticalSlope.length; j++){
-          if(chips[chips[i].neighbors.verticalSlope[j]].hasTwoVerticalNeighbors){
-            console.log('Yup we\'ve got four in a row');
-            declareWinner(chips[0].color);
-            winnerFound = true;
-          }
+    }
+    if (chips[i].hasTwoVerticalNeighbors){
+      for (var j = 0; j < chips[i].neighbors.verticalSlope.length; j++){
+        if(chips[chips[i].neighbors.verticalSlope[j]].hasTwoVerticalNeighbors){
+          console.log('Yup we\'ve got four in a row');
+          declareWinner(chips[0].color);
+          i = chips.length;
         }
       }
     }
@@ -221,5 +218,12 @@ function declareWinner(color){
     winningText.textContent = 'Computer Wins!!!';
   }
   document.getElementById('winner').appendChild(winningText);
+  removeEvents();
+}
+function removeEvents(){
+  for (var i = 0; i < choices.length; i++) {
+    var choiceBox = document.getElementById(choices[i]);
+    choiceBox.removeEventListener('click', handleClick);
+  }
 }
 addEvents(choices);
