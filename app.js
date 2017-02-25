@@ -118,6 +118,8 @@ function addEvents(choices){
     var choiceBox = document.getElementById(choices[i]);
     choiceBox.addEventListener('click', handleClick);
   }
+  // var gameBoard = document.getElementById('game-board');
+  // gameBoard.addEventListener('click', handleClick);
 }
 function handleClick(event){
   console.log('--------Begin New Chip-----------');
@@ -225,5 +227,7 @@ function removeEvents(){
     var choiceBox = document.getElementById(choices[i]);
     choiceBox.removeEventListener('click', handleClick);
   }
+  // var gameBoard = document.getElementById('game-board');
+  // gameBoard.removeEventListener('click', handleClick);
 }
 addEvents(choices);

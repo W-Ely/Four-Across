@@ -17,6 +17,8 @@ td {
   border: 1px solid black;
 }
 body {
+  width: 900px;
+  margin: auto;
   background-color: white;
 }
 .winner {
