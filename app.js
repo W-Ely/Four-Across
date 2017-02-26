@@ -15,6 +15,9 @@ var bChips = [];
 var rChips = [];
 var choices = ['column1', 'column2', 'column3', 'column4', 'column5', 'column6', 'column7'];
 var checkWinner = false;
+var foundWinner = false;
+var computerMoveSpeed = 1000; // delay before computer move in Milliseconds.
+var computerDelayId;
 function Chip(color){
   this.color = color;
   this.neighbors = {};
@@ -43,12 +46,12 @@ Chip.prototype.findNeighbors = function(chips){
     var otherYCoord = chips[i].location.y;
     var thisXCoord = this.location.x;
     var thisYCoord = this.location.y;
-    //does the chip have a neighbors. 7 case 0:0 with X1:-1, X0:-1, X-1,-1, X-1,0, X-1,1, X0,1, X1,1 X0:-1
-    // passing 0:0 and 1:-1, -1:-1, -1:1, 1:1 diagonals
+    //does the chip have a neighbor. 7 case 0:0 with X1:-1, X0:-1, X-1,-1, X-1,0, X-1,1, X0,1, X1,1 X0:-1
+    // passing 0:0 with 1:-1, -1:-1, -1:1, 1:1 diagonals
     if ((Math.abs(thisXCoord - otherXCoord) === 1 && Math.abs(thisYCoord - otherYCoord) === 1) ||
-      //passing 0:0 and 0:1, 0:-1, horizontal
+      //passing 0:0 with 0:1, 0:-1, horizontal
       (thisXCoord - otherXCoord === 0 && Math.abs(thisYCoord - otherYCoord) === 1) ||
-      //passing -1:0, down below
+      //passing 0:0 with -1:0, down below
       (Math.abs(thisXCoord - otherXCoord) === 1 && thisYCoord - otherYCoord === 0)){
       console.log('Chip ' + thisXCoord + ':' + thisYCoord + ' is next to chip ' + otherXCoord + ':' + otherYCoord);
       console.log('The slope is ((ThisY - OtherY)/(ThisX - OtherX))', ((thisYCoord - otherYCoord) / (thisXCoord - otherXCoord)));
@@ -95,9 +98,9 @@ Chip.prototype.findNeighbors = function(chips){
           checkWinner = true;
           console.log('This chip ' + thisXCoord + ':' + thisYCoord + ' now has 2 Positive  Slope neighbors');
         }
-      } else if (((thisYCoord - otherYCoord) / (thisXCoord - otherXCoord)) === (-1)) {
+      } else if ((thisYCoord - otherYCoord) / (thisXCoord - otherXCoord) === -1) {
         this.neighbors.negativeSlope.push(i);
-        chips[i].neighbors.negativeSlope.push(chips.length + 1);
+        chips[i].neighbors.negativeSlope.push(chips.length);
         console.log('This new chip: ' + thisXCoord + ':' + thisYCoord, this, 'and this chip ' + otherXCoord + ':' + otherYCoord, chips[i], 'are now NegativeSlope neighbors');
         if (chips[i].neighbors.negativeSlope.length === 2) {
           chips[i].hasTwoNegativeNeighbors = true;
@@ -137,27 +140,36 @@ function handleClick(event){
   if(checkWinner){
     checkChipsForWinner(bChips);
   }
-  computersTurn();
+  if (!foundWinner){
+    setComputerDelay();
+  }
 }
 //obviously could be DRYer
 function checkChipsForWinner(chips){
   console.log('Checking for winner.....');
   for (var i = 0; i < chips.length; i++) {
+    if (foundWinner){
+      break;
+    }
     if (chips[i].hasTwoPositiveNeighbors){
+      // debugger;
       for (var j = 0; j < chips[i].neighbors.positiveSlope.length; j++){
         if(chips[chips[i].neighbors.positiveSlope[j]].hasTwoPositiveNeighbors){
           console.log('Yup we\'ve got four in a row');
           declareWinner(chips[0].color);
-          i = chips.length;
+          foundWinner = true;
+          break;
         }
       }
     }
     if (chips[i].hasTwoNegativeNeighbors){
+      // debugger;
       for (var j = 0; j < chips[i].neighbors.negativeSlope.length; j++){
         if(chips[chips[i].neighbors.negativeSlope[j]].hasTwoNegativeNeighbors){
           console.log('Yup we\'ve got four in a row');
           declareWinner(chips[0].color);
-          i = chips.length;
+          foundWinner = true;
+          break;
         }
       }
     }
@@ -166,7 +178,8 @@ function checkChipsForWinner(chips){
         if(chips[chips[i].neighbors.horizontalSlope[j]].hasTwoHorizontalNeighbors){
           console.log('Yup we\'ve got four in a row');
           declareWinner(chips[0].color);
-          i = chips.length;
+          foundWinner = true;
+          break;
         }
       }
     }
@@ -175,7 +188,8 @@ function checkChipsForWinner(chips){
         if(chips[chips[i].neighbors.verticalSlope[j]].hasTwoVerticalNeighbors){
           console.log('Yup we\'ve got four in a row');
           declareWinner(chips[0].color);
-          i = chips.length;
+          foundWinner = true;
+          break;
         }
       }
     }
@@ -183,7 +197,7 @@ function checkChipsForWinner(chips){
 }
 function changeBoardColors(chip){
   var chipLocation = document.getElementById('x' + chip.location.x + 'y' + chip.location.y);
-  console.log('Checking Chip location for color change ' + 'x' + chip.location.x + 'y' + chip.location.y);
+  // console.log('Checking Chip location for color change ' + 'x' + chip.location.x + 'y' + chip.location.y);
   if (chip.color === 'b') {
     chipLocation.setAttribute('style', 'background-color: blue');
   } else {
@@ -193,12 +207,13 @@ function changeBoardColors(chip){
 function computersTurn(){
   console.log('-------Computer Turn--------');
   var chip = new Chip('r');
-  console.log('brand new computer chip', chip);
+  // console.log('brand new computer chip', chip);
   chip.findLandingLocation(getRandomDropColumn());
   console.log('This new computer chip is at x:y ' + chip.location.x + ':' + chip.location.y);
   chip.findNeighbors(rChips);
   rChips.push(chip);
   changeBoardColors(chip);
+  removeComputerDelay();
   if(checkWinner){
     checkChipsForWinner(rChips);
   }
@@ -226,4 +241,12 @@ function removeEvents(){
     choiceBox.removeEventListener('click', handleClick);
   }
 }
+// ------Interval Management
+function setComputerDelay(){
+  computerDelayId = setInterval(computersTurn, computerMoveSpeed);
+}
+function removeComputerDelay(){
+  clearInterval(computerDelayId);
+}
+// --------------------------
 addEvents(choices);

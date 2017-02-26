@@ -1,9 +1,10 @@
 .choice {
   width: 700px;
-  height: 100px;
-  border: 1px solid black;
+  height: 619px;
+  border: 0px;
   border-collapse: collapse;
-  margin-bottom: 10px;
+  position: absolute;
+  /*display: none;*/
 }
 .board {
   width: 700px;
@@ -17,6 +18,8 @@ td {
   border: 1px solid black;
 }
 body {
+  width: 900px;
+  margin: auto;
   background-color: white;
 }
 .winner {
