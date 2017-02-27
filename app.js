@@ -137,6 +137,7 @@ function handleClick(event){
   } else {
     console.log('Looks like that column is full!');
   }
+  removeEvents(choices);
   if(checkWinner){
     checkChipsForWinner(bChips);
   }
@@ -214,6 +215,7 @@ function computersTurn(){
   rChips.push(chip);
   changeBoardColors(chip);
   removeComputerDelay();
+  addEvents(choices);
   if(checkWinner){
     checkChipsForWinner(rChips);
   }
@@ -233,9 +235,9 @@ function declareWinner(color){
     winningText.textContent = 'Computer Wins!!!';
   }
   document.getElementById('winner').appendChild(winningText);
-  removeEvents();
+  removeEvents(choices);
 }
-function removeEvents(){
+function removeEvents(choices){
   for (var i = 0; i < choices.length; i++) {
     var choiceBox = document.getElementById(choices[i]);
     choiceBox.removeEventListener('click', handleClick);
